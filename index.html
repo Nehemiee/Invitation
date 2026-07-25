@@ -1,0 +1,1124 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Jost:wght@300;400;500;600;700&display=swap');
+
+#invit-app, #invit-app * { box-sizing: border-box; }
+
+#invit-app {
+  --ink: #0F1F19;
+  --card: #172A22;
+  --card-2: #1E362B;
+  --gold: #C9A25B;
+  --gold-soft: #E4C77E;
+  --rose: #C9897E;
+  --cream: #F4ECD8;
+  --cream-dim: #B9AF97;
+  --line: rgba(244,236,216,0.14);
+  --ok: #8FAE8B;
+  --err: #C97A6C;
+
+  font-family: 'Jost', sans-serif;
+  background: radial-gradient(ellipse at 50% -10%, #1C3327 0%, var(--ink) 55%);
+  color: var(--cream);
+  min-height: 100%;
+  padding: clamp(20px, 4vw, 56px) clamp(14px, 4vw, 24px);
+  position: relative;
+  overflow-x: hidden;
+}
+
+#invit-app .display { font-family: 'Playfair Display', serif; }
+
+#invit-app .wrap { max-width: 640px; margin: 0 auto; position: relative; }
+
+/* ---- top utility bar ---- */
+#invit-app .topbar {
+  display: flex; justify-content: flex-end; margin-bottom: 18px;
+}
+#invit-app .seal-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; border: 1px solid var(--line); color: var(--cream-dim);
+  font-family: 'Jost', sans-serif; font-size: 12.5px; letter-spacing: 0.06em;
+  padding: 7px 14px; border-radius: 999px; cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s;
+}
+#invit-app .seal-btn:hover { border-color: var(--gold); color: var(--gold-soft); background: rgba(201,162,91,0.06); }
+#invit-app .seal-btn:focus-visible, #invit-app button:focus-visible, #invit-app input:focus-visible, #invit-app select:focus-visible, #invit-app textarea:focus-visible {
+  outline: 2px solid var(--gold-soft); outline-offset: 2px;
+}
+
+/* ---- envelope intro ---- */
+#invit-app .envelope-stage {
+  position: relative; height: 0; overflow: visible;
+}
+#invit-app .envelope {
+  position: relative; margin: 0 auto 10px; width: 100%; max-width: 420px; height: 90px;
+  perspective: 800px;
+}
+#invit-app .envelope-flap {
+  position: absolute; top: 0; left: 0; right: 0; height: 90px;
+  background: linear-gradient(135deg, #234232, #1A3227);
+  clip-path: polygon(0 0, 100% 0, 50% 62%);
+  border: 1px solid var(--line);
+  transform-origin: top center;
+  animation: flapOpen 1.4s 0.3s cubic-bezier(.6,.05,.3,1) forwards;
+}
+@keyframes flapOpen { to { transform: rotateX(180deg); opacity: 0.15; } }
+
+/* ---- invitation card ---- */
+#invit-app .card {
+  background: linear-gradient(180deg, var(--card), var(--card-2));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: clamp(26px, 5vw, 46px);
+  position: relative;
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.55);
+  opacity: 0;
+  transform: translateY(28px) scale(.98);
+  animation: cardRise .9s 0.55s cubic-bezier(.2,.7,.3,1) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  #invit-app .card { animation: none; opacity: 1; transform: none; }
+  #invit-app .envelope-flap { animation: none; opacity: 0; }
+}
+@keyframes cardRise { to { opacity: 1; transform: translateY(0) scale(1); } }
+
+#invit-app .card::before, #invit-app .card::after {
+  content: ""; position: absolute; top: 22px; bottom: 22px; width: 1px;
+  background: repeating-linear-gradient(to bottom, var(--line) 0 6px, transparent 6px 12px);
+  display: none;
+}
+@media (min-width: 560px) {
+  #invit-app .card::before, #invit-app .card::after { display: block; }
+  #invit-app .card::before { left: 10px; }
+  #invit-app .card::after { right: 10px; }
+}
+
+#invit-app .emoji-hero { font-size: 38px; text-align: center; margin-bottom: 6px; }
+#invit-app .title { font-size: clamp(24px, 4.6vw, 34px); text-align: center; line-height: 1.2; font-weight: 700; color: var(--gold-soft); margin: 0 0 12px; }
+#invit-app .subtitle { font-style: italic; text-align: center; color: var(--cream-dim); font-size: clamp(14.5px, 2.4vw, 16.5px); max-width: 440px; margin: 0 auto 26px; line-height: 1.55; }
+
+#invit-app .divider { display: flex; align-items: center; gap: 12px; margin: 22px 0; color: var(--gold); opacity: .55; }
+#invit-app .divider::before, #invit-app .divider::after { content:""; flex:1; height:1px; background: var(--line); }
+
+#invit-app .infos { display: grid; gap: 12px; margin-bottom: 6px; }
+#invit-app .info-row { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; }
+#invit-app .info-icon { font-size: 17px; width: 22px; flex-shrink: 0; }
+#invit-app .info-label { color: var(--cream-dim); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; display:block; margin-bottom: 2px; }
+#invit-app .info-value { color: var(--cream); }
+
+#invit-app .maps-link {
+  display: inline-flex; align-items: center; gap: 7px; margin-top: 12px;
+  color: var(--gold-soft); text-decoration: none; font-size: 14px; border-bottom: 1px solid var(--gold); padding-bottom: 2px;
+  transition: opacity .2s;
+}
+#invit-app .maps-link:hover { opacity: .75; }
+
+#invit-app .deadline-pill {
+  display: inline-block; margin-top: 18px; font-size: 12.5px; color: var(--rose);
+  border: 1px solid rgba(201,137,126,0.4); padding: 6px 13px; border-radius: 999px; background: rgba(201,137,126,0.06);
+}
+
+/* ---- form ---- */
+#invit-app .form-card { margin-top: 26px; }
+#invit-app .form-step { margin-bottom: 26px; }
+#invit-app .step-num { font-family: 'Playfair Display', serif; font-style: italic; color: var(--gold); font-size: 13px; letter-spacing: .06em; }
+#invit-app .step-title { font-size: 18px; font-weight: 600; color: var(--cream); margin: 3px 0 14px; font-family: 'Playfair Display', serif; }
+
+#invit-app label.field-label { display:block; font-size: 12.5px; color: var(--cream-dim); margin-bottom: 6px; letter-spacing: .03em; }
+#invit-app input[type=text], #invit-app input[type=password], #invit-app input[type=date], #invit-app input[type=time], #invit-app textarea, #invit-app select {
+  width: 100%; background: rgba(0,0,0,0.18); border: 1px solid var(--line); color: var(--cream);
+  padding: 11px 13px; border-radius: 9px; font-family: 'Jost', sans-serif; font-size: 14.5px;
+}
+#invit-app input::placeholder, #invit-app textarea::placeholder { color: rgba(244,236,216,0.32); }
+#invit-app .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { #invit-app .grid-2 { grid-template-columns: 1fr; } }
+
+#invit-app .choice-group { display: grid; gap: 9px; }
+#invit-app .choice {
+  display: flex; align-items: center; gap: 11px; border: 1px solid var(--line); border-radius: 10px;
+  padding: 12px 14px; cursor: pointer; transition: border-color .18s, background .18s;
+  font-size: 14.5px;
+}
+#invit-app .choice:hover { border-color: rgba(201,162,91,0.5); }
+#invit-app .choice input { accent-color: var(--gold); width: 16px; height: 16px; flex-shrink: 0; }
+#invit-app .choice.checked { border-color: var(--gold); background: rgba(201,162,91,0.08); }
+#invit-app .sub-field { margin-top: 8px; margin-left: 27px; }
+
+#invit-app .send-btn {
+  width: 100%; margin-top: 8px; position: relative;
+  background: radial-gradient(circle at 35% 30%, var(--gold-soft), var(--gold) 65%, #A9803E 100%);
+  color: #1B2A1F; border: none; border-radius: 999px; padding: 15px 20px;
+  font-family: 'Jost', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: .03em;
+  cursor: pointer; box-shadow: 0 10px 24px -10px rgba(201,162,91,0.6);
+  transition: transform .15s, box-shadow .15s;
+}
+#invit-app .send-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 28px -10px rgba(201,162,91,0.75); }
+#invit-app .send-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+#invit-app .hint { font-size: 12.5px; color: var(--cream-dim); margin-top: 8px; text-align: center; }
+#invit-app .error-msg { color: var(--err); font-size: 13px; margin-top: 6px; }
+
+#invit-app .confirm-card { text-align: center; padding: 46px 24px; }
+#invit-app .confirm-card .emoji-hero { font-size: 52px; }
+#invit-app .already-box { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: rgba(143,174,139,0.06); }
+
+/* ---- admin ---- */
+#invit-app .admin-wrap { max-width: 780px; }
+#invit-app .panel { background: linear-gradient(180deg, var(--card), var(--card-2)); border: 1px solid var(--line); border-radius: 16px; padding: clamp(20px,4vw,32px); margin-bottom: 22px; }
+#invit-app .panel h2 { font-family:'Playfair Display', serif; font-size: 20px; color: var(--gold-soft); margin: 0 0 18px; }
+#invit-app .field { margin-bottom: 14px; }
+#invit-app .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 12px; margin-bottom: 20px; }
+#invit-app .stat { border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; }
+#invit-app .stat .num { font-family:'Playfair Display', serif; font-size: 26px; color: var(--gold-soft); }
+#invit-app .stat .lbl { font-size: 11.5px; color: var(--cream-dim); text-transform: uppercase; letter-spacing: .04em; margin-top: 3px; }
+#invit-app table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+#invit-app th, #invit-app td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+#invit-app th { color: var(--cream-dim); font-weight: 500; font-size: 11.5px; text-transform: uppercase; letter-spacing: .03em; }
+#invit-app .badge { display:inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; }
+#invit-app .badge.yes { background: rgba(143,174,139,0.15); color: var(--ok); }
+#invit-app .badge.no { background: rgba(201,122,108,0.15); color: var(--err); }
+#invit-app .table-scroll { overflow-x: auto; }
+#invit-app .btn-row { display:flex; gap:10px; flex-wrap: wrap; margin-top: 6px;}
+#invit-app .btn-secondary {
+  background: transparent; border: 1px solid var(--gold); color: var(--gold-soft); padding: 10px 18px;
+  border-radius: 999px; font-family:'Jost', sans-serif; font-size: 13.5px; cursor: pointer; transition: background .2s;
+}
+#invit-app .btn-secondary:hover { background: rgba(201,162,91,0.08); }
+#invit-app .empty-state { text-align:center; color: var(--cream-dim); padding: 30px 10px; font-size: 14px; }
+#invit-app .loading-state { text-align:center; padding: 60px 10px; color: var(--cream-dim); }
+#invit-app .link-box { display:flex; gap:8px; align-items:center; background: rgba(0,0,0,0.2); border:1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13px; word-break: break-all; }
+</style>
+
+<div id="invit-app">
+  <div class="wrap" id="invit-root">
+    <div class="loading-state">Ouverture de l'invitation…</div>
+  </div>
+</div>
+
+<!-- ==================== FIREBASE ====================
+     1. Créez un projet sur https://console.firebase.google.com
+     2. Ajoutez une "application Web" (icône </>) et copiez la config ci-dessous
+     3. Activez Firestore Database (mode production) dans le menu "Build"
+     4. Dans Firestore > Règles, collez les règles fournies dans la conversation
+======================================================= -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+
+<script>
+  // 👉 REMPLACEZ ces valeurs par celles de VOTRE projet Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyCpb1ll44PQvb5Z9waPqws2oPgBr5Rj4Hc",
+    authDomain: "boutique-stock.firebaseapp.com",
+    projectId: "boutique-stock",
+    storageBucket: "boutique-stock.firebasestorage.app",
+    messagingSenderId: "766123518493",
+    appId: "1:766123518493:web:deb2e6c4d49d7b2d13b4f4"
+  };
+
+  let db = null;
+  let firebaseInitError = null;
+  try{
+    if(!firebaseConfig.apiKey || firebaseConfig.apiKey === 'VOTRE_API_KEY'){
+      throw new Error('firebaseConfig non renseigné — remplacez les valeurs par celles de votre projet Firebase.');
+    }
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+  }catch(e){
+    firebaseInitError = e.message || String(e);
+    console.error('Erreur init Firebase:', e);
+  }
+
+  // Adaptateur de stockage : reproduit l'API storage.get/set/delete/list, mais sur Firestore
+  // (collection unique "storage", où chaque document = une clé)
+  const storage = {
+    async get(key, shared){
+      if(!db) throw new Error(firebaseInitError || 'Firestore non initialisé');
+      const doc = await db.collection('storage').doc(key).get();
+      if(!doc.exists) throw new Error('not-found: ' + key);
+      return { key, value: doc.data().value, shared: !!shared };
+    },
+    async set(key, value, shared){
+      if(!db) throw new Error(firebaseInitError || 'Firestore non initialisé');
+      await db.collection('storage').doc(key).set({ value, updatedAt: Date.now() });
+      return { key, value, shared: !!shared };
+    },
+    async delete(key, shared){
+      if(!db) throw new Error(firebaseInitError || 'Firestore non initialisé');
+      await db.collection('storage').doc(key).delete();
+      return { key, deleted: true, shared: !!shared };
+    },
+    async list(prefix, shared){
+      if(!db) throw new Error(firebaseInitError || 'Firestore non initialisé');
+      let q = db.collection('storage').orderBy(firebase.firestore.FieldPath.documentId());
+      if(prefix){ q = q.startAt(prefix).endAt(prefix + '\uf8ff'); }
+      const snap = await q.get();
+      const keys = [];
+      snap.forEach(d => keys.push(d.id));
+      return { keys, prefix, shared: !!shared };
+    }
+  };
+</script>
+
+<script>
+(function(){
+  const EVENTS_INDEX_KEY = 'events-index';
+  const configKey = (id) => 'event-config:' + id;
+  const rsvpPrefix = (id) => 'rsvp:' + id + ':';
+  const genEventId = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  let state = { mode: 'loading', eventId: null, eventsIndex: null, config: null, error: null, submitting: false, rsvps: null, authed: false };
+
+  const root = document.getElementById('invit-root');
+  const esc = (s) => (s || '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function fmtDateLong(iso){
+    if(!iso) return '';
+    try{
+      const d = new Date(iso + 'T00:00:00');
+      return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    }catch(e){ return iso; }
+  }
+
+  async function loadConfig(){
+    try{
+      const res = await storage.get(configKey(state.eventId), true);
+      state.config = res ? JSON.parse(res.value) : null;
+    }catch(e){ state.config = null; }
+  }
+
+  async function loadRsvps(){
+    try{
+      const listRes = await storage.list(rsvpPrefix(state.eventId), true);
+      const keys = (listRes && listRes.keys) || [];
+      const items = [];
+      for(const k of keys){
+        try{
+          const r = await storage.get(k, true);
+          if(r) items.push(JSON.parse(r.value));
+        }catch(e){}
+      }
+      items.sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+      state.rsvps = items;
+    }catch(e){ state.rsvps = []; }
+  }
+
+  async function loadEventsIndex(){
+    try{
+      const res = await storage.get(EVENTS_INDEX_KEY, true);
+      state.eventsIndex = res ? JSON.parse(res.value) : [];
+    }catch(e){ state.eventsIndex = []; }
+  }
+
+  async function saveEventsIndex(list){
+    await storage.set(EVENTS_INDEX_KEY, JSON.stringify(list), true);
+  }
+
+  async function upsertEventIndex(entry){
+    await loadEventsIndex();
+    const idx = state.eventsIndex.findIndex(e => e.id === entry.id);
+    if(idx >= 0) state.eventsIndex[idx] = { ...state.eventsIndex[idx], ...entry };
+    else state.eventsIndex.push(entry);
+    await saveEventsIndex(state.eventsIndex);
+  }
+
+  async function removeEventIndex(id){
+    await loadEventsIndex();
+    state.eventsIndex = state.eventsIndex.filter(e => e.id !== id);
+    await saveEventsIndex(state.eventsIndex);
+  }
+
+  function goToEvent(id, replace){
+    const url = new URL(location.href);
+    url.searchParams.set('event', id);
+    history[replace ? 'replaceState' : 'pushState']({}, '', url);
+    state.eventId = id;
+  }
+
+  function goHome(){
+    const url = new URL(location.href);
+    url.searchParams.delete('event');
+    history.pushState({}, '', url);
+    state.eventId = null;
+  }
+
+  // ---------- Mémoire locale (empêche un invité de revoir le formulaire) ----------
+  function localRsvpKey(eventId){ return 'rsvp-done:' + eventId; }
+  function getLocalRsvp(eventId){
+    try{
+      const raw = localStorage.getItem(localRsvpKey(eventId));
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+  function setLocalRsvp(eventId, data){
+    try{ localStorage.setItem(localRsvpKey(eventId), JSON.stringify(data)); }catch(e){}
+  }
+
+  function enterGuestMode(){
+    const local = getLocalRsvp(state.eventId);
+    if(local && !state.forceForm){
+      state.lastRsvp = local;
+      state.mode = 'already-responded';
+    }else{
+      state.mode = 'guest';
+    }
+  }
+
+  function mapsUrl(cfg){
+    if(cfg.mapsLink) return cfg.mapsLink;
+    const q = encodeURIComponent(cfg.address || cfg.location || '');
+    return `https://www.google.com/maps/search/?api=1&query=${q}`;
+  }
+
+  function daysLeft(deadline){
+    if(!deadline) return null;
+    const d = new Date(deadline + 'T23:59:59');
+    const diff = Math.ceil((d - new Date()) / (1000*60*60*24));
+    return diff;
+  }
+
+  function render(){
+    if(state.mode === 'loading'){
+      root.innerHTML = `<div class="loading-state">Ouverture de l'invitation…</div>`;
+      return;
+    }
+    if(state.mode === 'home'){ renderHome(); return; }
+    if(state.mode === 'setup'){ renderSetup(); return; }
+    if(state.mode === 'guest'){ renderGuest(); return; }
+    if(state.mode === 'already-responded'){ renderAlreadyResponded(); return; }
+    if(state.mode === 'confirmed'){ renderConfirmed(); return; }
+    if(state.mode === 'admin-login'){ renderAdminLogin(); return; }
+    if(state.mode === 'admin'){ renderAdmin(); return; }
+  }
+
+  // ---------- HOME (liste des évènements) ----------
+  function renderHome(){
+    const list = state.eventsIndex || [];
+    root.innerHTML = `
+      <div class="admin-wrap" style="margin:0 auto;">
+        <div class="topbar" style="justify-content:space-between; align-items:center;">
+          <span class="display" style="font-size:22px; color:var(--gold-soft);">✨ Mes évènements</span>
+          <button class="seal-btn" id="new-event-btn">+ Nouvel évènement</button>
+        </div>
+        <div class="panel">
+          ${list.length === 0 ? `<div class="empty-state">Aucun évènement pour le moment. Créez votre première invitation pour un client !</div>` : `
+          <div class="table-scroll">
+          <table>
+            <thead><tr><th>Évènement</th><th>Date</th><th></th></tr></thead>
+            <tbody>
+              ${list.slice().sort((a,b) => (b.createdAt||0)-(a.createdAt||0)).map(e => `
+                <tr>
+                  <td>${esc(e.title || 'Sans titre')}</td>
+                  <td>${e.date ? esc(fmtDateLong(e.date)) : '—'}</td>
+                  <td style="text-align:right; white-space:nowrap;">
+                    <button class="btn-secondary" data-open="${esc(e.id)}" style="padding:6px 12px; font-size:12.5px;">👁 Ouvrir</button>
+                    <button class="btn-secondary" data-admin="${esc(e.id)}" style="padding:6px 12px; font-size:12.5px;">🔏 Gérer</button>
+                    <button class="btn-secondary" data-del="${esc(e.id)}" style="padding:6px 12px; font-size:12.5px; border-color:var(--err); color:var(--err);">🗑 Supprimer</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          </div>`}
+        </div>
+      </div>
+    `;
+
+    document.getElementById('new-event-btn').addEventListener('click', () => {
+      goToEvent(genEventId());
+      state.config = null;
+      state.mode = 'setup';
+      render();
+    });
+    root.querySelectorAll('[data-open]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        goToEvent(btn.getAttribute('data-open'));
+        state.mode = 'loading'; render();
+        await loadConfig();
+        state.mode = 'setup';
+        if(state.config){ enterGuestMode(); }
+        render();
+      });
+    });
+    root.querySelectorAll('[data-admin]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        goToEvent(btn.getAttribute('data-admin'));
+        state.mode = 'loading'; render();
+        await loadConfig();
+        state.mode = state.config ? 'admin-login' : 'setup';
+        render();
+      });
+    });
+    root.querySelectorAll('[data-del]').forEach(btn => {
+      btn.addEventListener('click', () => handleDeleteEvent(btn.getAttribute('data-del')));
+    });
+  }
+
+  async function handleDeleteEvent(id){
+    const entry = (state.eventsIndex || []).find(e => e.id === id);
+    const name = entry ? (entry.title || 'cet évènement') : id;
+    let cfg = null;
+    try{
+      const res = await storage.get(configKey(id), true);
+      cfg = res ? JSON.parse(res.value) : null;
+    }catch(e){}
+    const pwd = prompt(`Pour supprimer définitivement "${name}" et toutes ses réponses, saisissez le mot de passe organisateur de cet évènement :`);
+    if(pwd === null) return;
+    if(!cfg || pwd !== cfg.adminPassword){ alert('Mot de passe incorrect.'); return; }
+    try{
+      const listRes = await storage.list(rsvpPrefix(id), true);
+      const keys = (listRes && listRes.keys) || [];
+      for(const k of keys){ try{ await storage.delete(k, true); }catch(e){} }
+      try{ await storage.delete(configKey(id), true); }catch(e){}
+      await removeEventIndex(id);
+      render();
+    }catch(e){
+      console.error('Erreur suppression évènement:', e);
+      alert("Une erreur est survenue lors de la suppression.");
+    }
+  }
+
+  // ---------- SETUP (première configuration) ----------
+  function renderSetup(){
+    root.innerHTML = `
+      <div class="topbar"><button class="seal-btn" id="home-link-btn">🏠 Mes évènements</button></div>
+      <div class="panel admin-wrap" style="margin: 0 auto;">
+        <h2>Configurer votre évènement ✨</h2>
+        <p style="color:var(--cream-dim); font-size:14px; margin-top:-10px; margin-bottom:22px;">
+          Personne n'a encore configuré cette invitation. Remplissez les informations ci-dessous : elles seront affichées à tous les invités qui ouvriront ce lien. Chaque évènement a son propre lien, vous pouvez donc en créer un par client.
+        </p>
+        <form id="setup-form">
+          <div class="grid-2">
+            <div class="field">
+              <label class="field-label">Émoji</label>
+              <input type="text" name="emoji" placeholder="🥂" value="🥂" maxlength="4">
+            </div>
+            <div class="field">
+              <label class="field-label">Mot de passe organisateur</label>
+              <input type="password" name="adminPassword" placeholder="Choisissez un mot de passe">
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Titre de l'invitation</label>
+            <input type="text" name="title" placeholder="Ex : L'Anniversaire des 30 ans de Thomas !">
+          </div>
+          <div class="field">
+            <label class="field-label">Petite phrase d'accroche</label>
+            <input type="text" name="subtitle" placeholder="Ex : La trentaine se fête en grand !">
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label class="field-label">Date</label>
+              <input type="date" name="date">
+            </div>
+            <div class="field">
+              <label class="field-label">Heure</label>
+              <input type="time" name="time" value="19:00">
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Lieu (nom)</label>
+            <input type="text" name="location" placeholder="Ex : Le Domaine des Roses">
+          </div>
+          <div class="field">
+            <label class="field-label">Adresse complète</label>
+            <input type="text" name="address" placeholder="Ex : 12 Rue des Fleurs, 75000 Paris">
+          </div>
+          <div class="field">
+            <label class="field-label">Lien Google Maps (optionnel — sinon généré depuis l'adresse)</label>
+            <input type="text" name="mapsLink" placeholder="https://maps.google.com/...">
+          </div>
+          <div class="field">
+            <label class="field-label">Date limite de réponse</label>
+            <input type="date" name="deadline">
+          </div>
+          <div id="setup-error" class="error-msg" style="display:none;"></div>
+          <button type="button" id="setup-submit-btn" class="send-btn" style="margin-top:10px;">Créer l'invitation</button>
+        </form>
+      </div>
+    `;
+    async function handleSetupSubmit(){
+      const form = document.getElementById('setup-form');
+      const errEl = document.getElementById('setup-error');
+      const btn = document.getElementById('setup-submit-btn');
+      errEl.style.display = 'none';
+      const fd = new FormData(form);
+      const cfg = Object.fromEntries(fd.entries());
+
+      const missing = ['title','date','time','location','address','adminPassword'].filter(k => !cfg[k] || !cfg[k].trim());
+      if(missing.length){
+        errEl.textContent = "Merci de remplir tous les champs obligatoires (titre, date, heure, lieu, adresse, mot de passe).";
+        errEl.style.display = '';
+        errEl.scrollIntoView({ behavior:'smooth', block:'center' });
+        return;
+      }
+      if(!db){
+        errEl.textContent = "Firebase n'est pas configuré : " + (firebaseInitError || "vérifiez firebaseConfig et vos règles Firestore.");
+        errEl.style.display = '';
+        return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Création…';
+      try{
+        if(!state.eventId){ state.eventId = genEventId(); goToEvent(state.eventId, true); }
+        const res = await storage.set(configKey(state.eventId), JSON.stringify(cfg), true);
+        if(!res) throw new Error('empty response');
+        await upsertEventIndex({ id: state.eventId, title: cfg.title, date: cfg.date, createdAt: Date.now() });
+        state.config = cfg;
+        enterGuestMode();
+        render();
+      }catch(err){
+        console.error('Erreur setup:', err);
+        btn.disabled = false; btn.textContent = "Créer l'invitation";
+        errEl.textContent = "Une erreur est survenue lors de l'enregistrement. Réessayez.";
+        errEl.style.display = '';
+        errEl.scrollIntoView({ behavior:'smooth', block:'center' });
+      }
+    }
+    document.getElementById('setup-submit-btn').addEventListener('click', handleSetupSubmit);
+    document.getElementById('setup-form').addEventListener('submit', (e) => { e.preventDefault(); handleSetupSubmit(); });
+    document.getElementById('setup-form').addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' && e.target.tagName !== 'TEXTAREA'){ e.preventDefault(); handleSetupSubmit(); }
+    });
+    document.getElementById('home-link-btn').addEventListener('click', async () => {
+      goHome();
+      state.mode = 'loading'; render();
+      await loadEventsIndex();
+      state.mode = 'home';
+      render();
+    });
+  }
+
+  // ---------- GUEST VIEW ----------
+  function renderGuest(){
+    const cfg = state.config;
+    const dl = daysLeft(cfg.deadline);
+    root.innerHTML = `
+      <div class="topbar">
+        <button class="seal-btn" id="admin-toggle">🔏 Espace organisateur</button>
+      </div>
+      <div class="envelope-stage">
+        <div class="envelope"><div class="envelope-flap"></div></div>
+      </div>
+      <div class="card">
+        <div class="emoji-hero">${esc(cfg.emoji || '🥂')}</div>
+        <h1 class="title display">${esc(cfg.title)}</h1>
+        ${cfg.subtitle ? `<p class="subtitle display">"${esc(cfg.subtitle)}"</p>` : ''}
+
+        <div class="divider">📍 Infos pratiques</div>
+        <div class="infos">
+          <div class="info-row"><span class="info-icon">📅</span><div><span class="info-label">Date</span><span class="info-value">${esc(fmtDateLong(cfg.date))}</span></div></div>
+          <div class="info-row"><span class="info-icon">⏰</span><div><span class="info-label">Heure</span><span class="info-value">À partir de ${esc(cfg.time)}</span></div></div>
+          <div class="info-row"><span class="info-icon">📌</span><div><span class="info-label">Lieu</span><span class="info-value">${esc(cfg.location)}, ${esc(cfg.address)}</span></div></div>
+        </div>
+        <a class="maps-link" href="${esc(mapsUrl(cfg))}" target="_blank" rel="noopener">🗺️ Ouvrir le trajet dans Google Maps →</a>
+        ${cfg.deadline ? `<div><span class="deadline-pill">⏳ Merci de répondre avant le ${esc(fmtDateLong(cfg.deadline))}${dl !== null && dl >= 0 ? ` (${dl} jour${dl>1?'s':''} restant${dl>1?'s':''})` : ''}</span></div>` : ''}
+
+        <div class="form-card">
+          <div class="divider">📝 Formulaire de confirmation</div>
+          ${state.forceForm ? `<div class="btn-row" style="margin-bottom:14px;"><button type="button" class="btn-secondary" id="cancel-edit-btn">← Annuler la modification</button></div>` : ''}
+          <form id="rsvp-form">
+            <div class="form-step">
+              <div class="step-num display">01</div>
+              <div class="step-title">Vos coordonnées</div>
+              <div class="grid-2">
+                <div><label class="field-label">Nom</label><input type="text" name="nom"></div>
+                <div><label class="field-label">Prénom</label><input type="text" name="prenom"></div>
+              </div>
+            </div>
+
+            <div class="form-step">
+              <div class="step-num display">02</div>
+              <div class="step-title">Votre présence</div>
+              <div class="choice-group" data-group="presence">
+                <label class="choice"><input type="radio" name="presence" value="oui"> Oui ! Je serai là pour faire la fête 🎉</label>
+                <label class="choice"><input type="radio" name="presence" value="non"> Désolé(e)… Je ne pourrai pas être présent(e) 😢</label>
+              </div>
+            </div>
+
+            <div class="form-step" id="accompagnants-step">
+              <div class="step-num display">03</div>
+              <div class="step-title">Vos accompagnants</div>
+              <div class="choice-group" data-group="accompagnement">
+                <label class="choice"><input type="radio" name="accompagnement" value="seul"> Seul(e)</label>
+                <label class="choice"><input type="radio" name="accompagnement" value="accompagne"> Accompagné(e)</label>
+              </div>
+              <div class="sub-field" id="nb-enfants-wrap" style="display:none;">
+                <label class="field-label">Combien de personnes vous accompagneront ?</label>
+                <input type="text" inputmode="numeric" name="nbAccompagnants" placeholder="Ex : 2">
+              </div>
+            </div>
+
+            <div class="form-step" id="drink-step">
+              <div class="step-num display">04</div>
+              <div class="step-title">🥤 Boisson</div>
+              <label class="field-label" style="margin-bottom:10px; display:block;">Quelle boisson préférerez-vous ?</label>
+              <div class="choice-group">
+                <label class="choice"><input type="radio" name="boisson" value="aucune"> Aucune</label>
+                <label class="choice"><input type="radio" name="boisson" value="fanta"> Fanta</label>
+                <label class="choice"><input type="radio" name="boisson" value="coca"> Coca Cola</label>
+                <label class="choice"><input type="radio" name="boisson" value="tonic"> Tonic</label>
+                <label class="choice"><input type="radio" name="boisson" value="jusceres"> Jus Cérès</label>
+                <label class="choice"><input type="radio" name="boisson" value="tembo"> Tembo</label>
+                <label class="choice"><input type="radio" name="boisson" value="simba"> Simba</label>
+                <label class="choice"><input type="radio" name="boisson" value="guinness"> Guinness</label>
+                <label class="choice"><input type="radio" name="boisson" value="castel"> Castel</label>
+                <label class="choice"><input type="radio" name="boisson" value="autre"> Autre</label>
+              </div>
+              <div class="sub-field" id="boisson-autre-wrap" style="display:none;">
+                <label class="field-label">Précisez votre boisson</label>
+                <input type="text" name="boissonAutre" placeholder="Ex : Eau pétillante">
+              </div>
+            </div>
+
+            <div class="form-step" id="playlist-step">
+              <div class="step-num display">05</div>
+              <div class="step-title">Optionnel — La playlist collaborative 🎶</div>
+              <label class="field-label">Quelle chanson te ferait danser à coup sûr ?</label>
+              <input type="text" name="chanson" placeholder="Titre — Artiste">
+            </div>
+
+            <div id="form-error" class="error-msg" style="display:none;"></div>
+            <button type="button" id="rsvp-submit-btn" class="send-btn">✉️ Envoyer ma réponse</button>
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('admin-toggle').addEventListener('click', () => {
+      state.mode = 'admin-login'; render();
+    });
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    if(cancelEditBtn) cancelEditBtn.addEventListener('click', () => {
+      state.forceForm = false;
+      enterGuestMode();
+      render();
+    });
+
+    const form = document.getElementById('rsvp-form');
+    const accompStep = document.getElementById('accompagnants-step');
+    const drinkStep = document.getElementById('drink-step');
+    const playlistStep = document.getElementById('playlist-step');
+    const nbEnfantsWrap = document.getElementById('nb-enfants-wrap');
+    const boissonAutreWrap = document.getElementById('boisson-autre-wrap');
+
+    function syncPresence(){
+      const val = form.querySelector('input[name=presence]:checked');
+      const isYes = val && val.value === 'oui';
+      accompStep.style.display = isYes ? '' : 'none';
+      drinkStep.style.display = isYes ? '' : 'none';
+      playlistStep.style.display = isYes ? '' : 'none';
+    }
+    form.querySelectorAll('input[name=presence]').forEach(el => el.addEventListener('change', syncPresence));
+    syncPresence();
+
+    form.querySelectorAll('input[name=accompagnement]').forEach(el => {
+      el.addEventListener('change', () => {
+        if(el.checked) nbEnfantsWrap.style.display = el.value === 'accompagne' ? '' : 'none';
+      });
+    });
+
+    form.querySelectorAll('input[name=boisson]').forEach(el => {
+      el.addEventListener('change', () => {
+        const autreChecked = form.querySelector('input[name=boisson][value=autre]').checked;
+        boissonAutreWrap.style.display = autreChecked ? '' : 'none';
+      });
+    });
+
+    // visual checked state on labels
+    form.querySelectorAll('.choice input').forEach(inp => {
+      inp.addEventListener('change', () => {
+        const group = inp.closest('.choice-group');
+        if(group){
+          group.querySelectorAll('.choice').forEach(c => c.classList.remove('checked'));
+        }
+        if(inp.checked) inp.closest('.choice').classList.add('checked');
+      });
+    });
+
+    // Pré-remplissage si l'invité modifie une réponse déjà enregistrée
+    const existingLocal = getLocalRsvp(state.eventId);
+    if(existingLocal){
+      const nomEl = form.querySelector('input[name=nom]');
+      const prenomEl = form.querySelector('input[name=prenom]');
+      if(nomEl) nomEl.value = existingLocal.nom || '';
+      if(prenomEl) prenomEl.value = existingLocal.prenom || '';
+      if(existingLocal.presence){
+        const el = form.querySelector(`input[name=presence][value="${existingLocal.presence}"]`);
+        if(el){ el.checked = true; el.closest('.choice').classList.add('checked'); }
+      }
+      if(existingLocal.accompagnement){
+        const el = form.querySelector(`input[name=accompagnement][value="${existingLocal.accompagnement}"]`);
+        if(el){ el.checked = true; el.closest('.choice').classList.add('checked'); }
+      }
+      if(existingLocal.nbAccompagnants){
+        const el = form.querySelector('input[name=nbAccompagnants]');
+        if(el) el.value = existingLocal.nbAccompagnants;
+      }
+      if(existingLocal.boisson){
+        const el = form.querySelector(`input[name=boisson][value="${existingLocal.boisson}"]`);
+        if(el){ el.checked = true; el.closest('.choice').classList.add('checked'); }
+      }
+      if(existingLocal.boissonAutre){
+        const el = form.querySelector('input[name=boissonAutre]');
+        if(el) el.value = existingLocal.boissonAutre;
+      }
+      if(existingLocal.chanson){
+        const el = form.querySelector('input[name=chanson]');
+        if(el) el.value = existingLocal.chanson;
+      }
+      syncPresence();
+      if(existingLocal.accompagnement === 'accompagne') nbEnfantsWrap.style.display = '';
+      if(existingLocal.boisson === 'autre') boissonAutreWrap.style.display = '';
+    }
+
+    async function handleRsvpSubmit(){
+      const errEl = document.getElementById('form-error');
+      errEl.style.display = 'none';
+      const fd = new FormData(form);
+      const presence = fd.get('presence');
+      const nom = (fd.get('nom') || '').trim();
+      const prenom = (fd.get('prenom') || '').trim();
+      if(!nom || !prenom){ errEl.textContent = "Merci d'indiquer votre nom et votre prénom."; errEl.style.display=''; errEl.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+      if(!presence){ errEl.textContent = "Merci d'indiquer votre présence."; errEl.style.display=''; errEl.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+      const data = {
+        id: (existingLocal && existingLocal.id) || ('rsvp_' + Date.now() + '_' + Math.random().toString(36).slice(2,8)),
+        nom: fd.get('nom') || '',
+        prenom: fd.get('prenom') || '',
+        presence,
+        accompagnement: fd.get('accompagnement') || '',
+        nbAccompagnants: fd.get('nbAccompagnants') || '',
+        boisson: fd.get('boisson') || '',
+        boissonAutre: fd.get('boissonAutre') || '',
+        chanson: fd.get('chanson') || '',
+        timestamp: Date.now()
+      };
+      const btn = document.getElementById('rsvp-submit-btn');
+      btn.disabled = true; btn.textContent = 'Envoi en cours…';
+      try{
+        const res = await storage.set(rsvpPrefix(state.eventId) + data.id, JSON.stringify(data), true);
+        if(!res) throw new Error('failed');
+        setLocalRsvp(state.eventId, data);
+        state.forceForm = false;
+        state.mode = 'confirmed';
+        state.lastRsvp = data;
+        render();
+      }catch(err){
+        console.error('Erreur RSVP:', err);
+        btn.disabled = false; btn.textContent = '✉️ Envoyer ma réponse';
+        errEl.textContent = "Une erreur est survenue lors de l'envoi, merci de réessayer.";
+        errEl.style.display = '';
+        errEl.scrollIntoView({behavior:'smooth',block:'center'});
+      }
+    }
+    document.getElementById('rsvp-submit-btn').addEventListener('click', handleRsvpSubmit);
+    form.addEventListener('submit', (e) => { e.preventDefault(); handleRsvpSubmit(); });
+    form.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' && e.target.tagName !== 'TEXTAREA'){ e.preventDefault(); handleRsvpSubmit(); }
+    });
+  }
+
+  function renderConfirmed(){
+    const yes = state.lastRsvp && state.lastRsvp.presence === 'oui';
+    root.innerHTML = `
+      <div class="card confirm-card">
+        <div class="emoji-hero">${yes ? '🎉' : '💌'}</div>
+        <h1 class="title display">${yes ? 'Merci, à très vite !' : 'Merci pour votre réponse'}</h1>
+        <p class="subtitle display">${yes ? '"Votre présence a bien été enregistrée. On a hâte de célébrer avec vous !"' : '"Nous sommes désolés de ne pas vous compter parmi nous, merci de nous avoir prévenus."'}</p>
+        <button class="btn-secondary" id="back-btn" style="margin-top:14px;">← Revoir l'invitation</button>
+      </div>
+    `;
+    document.getElementById('back-btn').addEventListener('click', () => { enterGuestMode(); render(); });
+  }
+
+  // ---------- DÉJÀ RÉPONDU (invité qui rouvre le lien) ----------
+  function renderAlreadyResponded(){
+    const cfg = state.config;
+    const dl = daysLeft(cfg.deadline);
+    const r = state.lastRsvp || {};
+    const yes = r.presence === 'oui';
+    root.innerHTML = `
+      <div class="topbar">
+        <button class="seal-btn" id="admin-toggle">🔏 Espace organisateur</button>
+      </div>
+      <div class="card">
+        <div class="emoji-hero">${esc(cfg.emoji || '🥂')}</div>
+        <h1 class="title display">${esc(cfg.title)}</h1>
+        ${cfg.subtitle ? `<p class="subtitle display">"${esc(cfg.subtitle)}"</p>` : ''}
+
+        <div class="divider">📍 Infos pratiques</div>
+        <div class="infos">
+          <div class="info-row"><span class="info-icon">📅</span><div><span class="info-label">Date</span><span class="info-value">${esc(fmtDateLong(cfg.date))}</span></div></div>
+          <div class="info-row"><span class="info-icon">⏰</span><div><span class="info-label">Heure</span><span class="info-value">À partir de ${esc(cfg.time)}</span></div></div>
+          <div class="info-row"><span class="info-icon">📌</span><div><span class="info-label">Lieu</span><span class="info-value">${esc(cfg.location)}, ${esc(cfg.address)}</span></div></div>
+        </div>
+        <a class="maps-link" href="${esc(mapsUrl(cfg))}" target="_blank" rel="noopener">🗺️ Ouvrir le trajet dans Google Maps →</a>
+        ${cfg.deadline ? `<div><span class="deadline-pill">⏳ Merci de répondre avant le ${esc(fmtDateLong(cfg.deadline))}${dl !== null && dl >= 0 ? ` (${dl} jour${dl>1?'s':''} restant${dl>1?'s':''})` : ''}</span></div>` : ''}
+
+        <div class="divider">${yes ? '✅' : '💌'} Votre réponse</div>
+        <div class="already-box">
+          <p style="margin:0 0 6px; font-size:15px;">
+            ${yes
+              ? `Vous avez confirmé votre présence${r.accompagnement==='accompagne' && r.nbAccompagnants ? ` avec ${esc(r.nbAccompagnants)} accompagnant${parseInt(r.nbAccompagnants)>1?'s':''}` : ''}. Merci, on a hâte de vous voir !`
+              : `Vous avez indiqué ne pas pouvoir être présent(e). Merci de nous avoir prévenus.`}
+          </p>
+          <p class="hint" style="margin:0; text-align:left;">Réponse enregistrée au nom de ${esc(r.prenom)} ${esc(r.nom)}.</p>
+        </div>
+        <button class="btn-secondary" id="edit-rsvp-btn" style="margin-top:16px; width:100%;">Modifier ma réponse</button>
+      </div>
+    `;
+    document.getElementById('admin-toggle').addEventListener('click', () => { state.mode = 'admin-login'; render(); });
+    document.getElementById('edit-rsvp-btn').addEventListener('click', () => {
+      state.forceForm = true;
+      state.mode = 'guest';
+      render();
+    });
+  }
+
+  // ---------- ADMIN ----------
+  function renderAdminLogin(){
+    root.innerHTML = `
+      <div class="panel" style="max-width:420px; margin: 60px auto;">
+        <h2>Espace organisateur 🔏</h2>
+        <form id="login-form">
+          <div class="field">
+            <label class="field-label">Mot de passe</label>
+            <input type="password" name="password" autofocus>
+          </div>
+          <div id="login-error" class="error-msg" style="display:none;">Mot de passe incorrect.</div>
+          <div class="btn-row">
+            <button type="button" id="login-submit-btn" class="send-btn">Se connecter</button>
+            <button type="button" class="btn-secondary" id="cancel-login">Annuler</button>
+          </div>
+        </form>
+      </div>
+    `;
+    document.getElementById('cancel-login').addEventListener('click', () => { enterGuestMode(); render(); });
+    async function handleLoginSubmit(){
+      const pwd = document.querySelector('#login-form input[name=password]').value;
+      if(!pwd){ document.getElementById('login-error').textContent = 'Merci de saisir un mot de passe.'; document.getElementById('login-error').style.display = ''; return; }
+      if(pwd === state.config.adminPassword){
+        state.authed = true;
+        state.mode = 'admin';
+        state.rsvps = null;
+        render();
+        await loadRsvps();
+        render();
+      }else{
+        document.getElementById('login-error').textContent = 'Mot de passe incorrect.';
+        document.getElementById('login-error').style.display = '';
+      }
+    }
+    document.getElementById('login-submit-btn').addEventListener('click', handleLoginSubmit);
+    document.getElementById('login-form').addEventListener('submit', (e) => { e.preventDefault(); handleLoginSubmit(); });
+    document.getElementById('login-form').addEventListener('keydown', (e) => {
+      if(e.key === 'Enter'){ e.preventDefault(); handleLoginSubmit(); }
+    });
+  }
+
+  function renderAdmin(){
+    const cfg = state.config;
+    if(state.rsvps === null){
+      root.innerHTML = `<div class="admin-wrap" style="margin:0 auto;"><div class="loading-state">Chargement des réponses…</div></div>`;
+      return;
+    }
+    const rsvps = state.rsvps;
+    const yesList = rsvps.filter(r => r.presence === 'oui');
+    const noList = rsvps.filter(r => r.presence === 'non');
+    let totalGuests = 0;
+    yesList.forEach(r => {
+      totalGuests += 1;
+      if(r.accompagnement === 'accompagne') totalGuests += (parseInt(r.nbAccompagnants) || 0);
+    });
+
+    const boissonLabels = { aucune:'Aucune', fanta:'Fanta', coca:'Coca Cola', tonic:'Tonic', jusceres:'Jus Cérès', tembo:'Tembo', simba:'Simba', guinness:'Guinness', castel:'Castel', autre:'Autre' };
+    const accompLabels = { seul:'Seul(e)', accompagne:'Accompagné(e)' };
+
+    root.innerHTML = `
+      <div class="admin-wrap" style="margin:0 auto;">
+        <div class="topbar" style="justify-content:space-between; align-items:center;">
+          <span class="display" style="font-size:20px; color:var(--gold-soft);">🔏 Espace organisateur</span>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="seal-btn" id="home-btn">🏠 Mes évènements</button>
+            <button class="seal-btn" id="preview-btn">👁 Voir l'invitation</button>
+            <button class="seal-btn" id="logout-btn">Déconnexion</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Lien à partager aux invités</h2>
+          <div class="link-box"><span id="share-link">${esc(location.href)}</span></div>
+          <div class="btn-row"><button class="btn-secondary" id="copy-link">Copier le lien</button></div>
+        </div>
+
+        <div class="panel">
+          <h2>Réponses</h2>
+          <div class="stats-row">
+            <div class="stat"><div class="num">${rsvps.length}</div><div class="lbl">Réponses reçues</div></div>
+            <div class="stat"><div class="num">${yesList.length}</div><div class="lbl">Présents</div></div>
+            <div class="stat"><div class="num">${noList.length}</div><div class="lbl">Absents</div></div>
+            <div class="stat"><div class="num">${totalGuests}</div><div class="lbl">Personnes attendues</div></div>
+          </div>
+          ${rsvps.length === 0 ? `<div class="empty-state">Aucune réponse pour le moment. Partagez le lien ci-dessus pour commencer à recevoir des confirmations.</div>` : `
+          <div class="btn-row" style="margin-bottom:14px;">
+            <button class="btn-secondary" id="export-csv">⬇ Exporter en CSV</button>
+            <button class="seal-btn" id="refresh-btn">↻ Actualiser</button>
+          </div>
+          <div class="table-scroll">
+          <table>
+            <thead><tr><th>Nom</th><th>Présence</th><th>Accompagnement</th><th>Boisson</th><th>Chanson</th><th></th></tr></thead>
+            <tbody>
+              ${rsvps.map(r => `
+                <tr>
+                  <td>${esc(r.prenom)} ${esc(r.nom)}</td>
+                  <td><span class="badge ${r.presence==='oui'?'yes':'no'}">${r.presence==='oui'?'Présent':'Absent'}</span></td>
+                  <td>${r.presence==='oui' ? (accompLabels[r.accompagnement]||'—') + (r.accompagnement==='accompagne' && r.nbAccompagnants ? ` (${esc(r.nbAccompagnants)} pers.)` : '') : '—'}</td>
+                  <td>${r.presence==='oui' && r.boisson ? esc(boissonLabels[r.boisson]||r.boisson) + (r.boisson==='autre' && r.boissonAutre ? ` — ${esc(r.boissonAutre)}` : '') : '—'}</td>
+                  <td>${r.chanson ? esc(r.chanson) : '—'}</td>
+                  <td><button class="btn-secondary" data-del-rsvp="${esc(r.id)}" style="padding:5px 12px; font-size:12px; border-color:var(--err); color:var(--err); white-space:nowrap;">🗑 Supprimer</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          </div>`}
+        </div>
+
+        <div class="panel">
+          <h2>Modifier les informations de l'évènement</h2>
+          <form id="edit-form">
+            <div class="grid-2">
+              <div class="field"><label class="field-label">Émoji</label><input type="text" name="emoji" value="${esc(cfg.emoji)}" maxlength="4"></div>
+              <div class="field"><label class="field-label">Mot de passe organisateur</label><input type="password" name="adminPassword" value="${esc(cfg.adminPassword)}"></div>
+            </div>
+            <div class="field"><label class="field-label">Titre</label><input type="text" name="title" value="${esc(cfg.title)}"></div>
+            <div class="field"><label class="field-label">Phrase d'accroche</label><input type="text" name="subtitle" value="${esc(cfg.subtitle||'')}"></div>
+            <div class="grid-2">
+              <div class="field"><label class="field-label">Date</label><input type="date" name="date" value="${esc(cfg.date)}"></div>
+              <div class="field"><label class="field-label">Heure</label><input type="time" name="time" value="${esc(cfg.time)}"></div>
+            </div>
+            <div class="field"><label class="field-label">Lieu (nom)</label><input type="text" name="location" value="${esc(cfg.location)}"></div>
+            <div class="field"><label class="field-label">Adresse complète</label><input type="text" name="address" value="${esc(cfg.address)}"></div>
+            <div class="field"><label class="field-label">Lien Google Maps (optionnel)</label><input type="text" name="mapsLink" value="${esc(cfg.mapsLink||'')}"></div>
+            <div class="field"><label class="field-label">Date limite de réponse</label><input type="date" name="deadline" value="${esc(cfg.deadline||'')}"></div>
+            <button type="button" id="edit-submit-btn" class="send-btn">Enregistrer les modifications</button>
+            <div id="save-msg" class="hint" style="display:none;">Enregistré ✓</div>
+            <div id="save-error" class="error-msg" style="display:none;">Erreur lors de la sauvegarde. Réessayez.</div>
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('logout-btn').addEventListener('click', () => { state.authed=false; enterGuestMode(); render(); });
+    document.getElementById('preview-btn').addEventListener('click', () => { state.mode='guest'; render(); });
+    document.getElementById('home-btn').addEventListener('click', async () => {
+      goHome();
+      state.authed = false; state.rsvps = null;
+      state.mode = 'loading'; render();
+      await loadEventsIndex();
+      state.mode = 'home';
+      render();
+    });
+    root.querySelectorAll('[data-del-rsvp]').forEach(btn => {
+      btn.addEventListener('click', () => handleDeleteRsvp(btn.getAttribute('data-del-rsvp')));
+    });
+    async function handleDeleteRsvp(id){
+      const r = (state.rsvps || []).find(x => x.id === id);
+      const label = r ? `${r.prenom} ${r.nom}`.trim() : 'cet invité';
+      if(!confirm(`Supprimer la réponse de ${label} ? Cette action est irréversible.`)) return;
+      try{
+        await storage.delete(rsvpPrefix(state.eventId) + id, true);
+        state.rsvps = state.rsvps.filter(x => x.id !== id);
+        render();
+      }catch(e){
+        console.error('Erreur suppression RSVP:', e);
+        alert("Une erreur est survenue lors de la suppression de cet invité.");
+      }
+    }
+    document.getElementById('copy-link').addEventListener('click', async () => {
+      try{ await navigator.clipboard.writeText(location.href); const b=document.getElementById('copy-link'); b.textContent='Copié ✓'; setTimeout(()=>b.textContent='Copier le lien',1500);}catch(e){}
+    });
+    const refreshBtn = document.getElementById('refresh-btn');
+    if(refreshBtn) refreshBtn.addEventListener('click', async () => { state.rsvps = null; render(); await loadRsvps(); render(); });
+    const exportBtn = document.getElementById('export-csv');
+    if(exportBtn) exportBtn.addEventListener('click', () => {
+      const rows = [['Prénom','Nom','Présence','Accompagnement','Nb personnes','Boisson','Précision boisson','Chanson']];
+      rsvps.forEach(r => rows.push([r.prenom,r.nom,r.presence==='oui'?'Présent':'Absent',accompLabels[r.accompagnement]||'',r.nbAccompagnants||'',boissonLabels[r.boisson]||r.boisson||'',r.boissonAutre||'',r.chanson||'']));
+      const csv = rows.map(r => r.map(c => `"${(c+'').replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'invites.csv'; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    async function handleEditSubmit(){
+      const form = document.getElementById('edit-form');
+      const fd = new FormData(form);
+      const newCfg = Object.fromEntries(fd.entries());
+      const btn = document.getElementById('edit-submit-btn');
+      const saveError = document.getElementById('save-error');
+      saveError.style.display = 'none';
+      btn.disabled = true;
+      try{
+        const res = await storage.set(configKey(state.eventId), JSON.stringify(newCfg), true);
+        if(!res) throw new Error('empty response');
+        await upsertEventIndex({ id: state.eventId, title: newCfg.title, date: newCfg.date });
+        state.config = newCfg;
+        document.getElementById('save-msg').style.display = '';
+        setTimeout(() => { const m = document.getElementById('save-msg'); if(m) m.style.display='none'; }, 2000);
+      }catch(err){
+        console.error('Erreur sauvegarde config:', err);
+        saveError.style.display = '';
+      }
+      btn.disabled = false;
+    }
+    document.getElementById('edit-submit-btn').addEventListener('click', handleEditSubmit);
+    document.getElementById('edit-form').addEventListener('submit', (e) => { e.preventDefault(); handleEditSubmit(); });
+  }
+
+  async function testStorage(){
+    if(!db){
+      return { ok:false, reason: firebaseInitError || 'Firebase non initialisé' };
+    }
+    try{
+      const testKey = 'diag-storage-test';
+      const setRes = await storage.set(testKey, String(Date.now()), true);
+      if(!setRes) return { ok:false, reason:'Écriture Firestore sans réponse.' };
+      const getRes = await storage.get(testKey, true);
+      if(!getRes) return { ok:false, reason:'Lecture Firestore sans réponse après écriture.' };
+      return { ok:true };
+    }catch(e){
+      console.error('Test Firestore échoué :', e);
+      return { ok:false, reason: (e && e.message) || String(e) };
+    }
+  }
+
+  // ---------- INIT ----------
+  (async function init(){
+    const test = await testStorage();
+    if(!test.ok){
+      root.innerHTML = `
+        <div class="panel" style="max-width:520px; margin: 60px auto; text-align:center;">
+          <div style="font-size:34px; margin-bottom:10px;">⚠️</div>
+          <h2 style="margin-bottom:10px;">Connexion à Firebase impossible</h2>
+          <p style="color:var(--cream-dim); font-size:14px; line-height:1.6; text-align:left;">
+            Raison technique : <code>${esc(test.reason)}</code><br><br>
+            Vérifiez que :<br>
+            • <code>firebaseConfig</code> a bien été remplacé par les valeurs de votre projet Firebase (en haut du fichier HTML)<br>
+            • Firestore Database est activé dans la console Firebase<br>
+            • les règles Firestore autorisent la lecture/écriture sur la collection <code>storage</code><br><br>
+            Rafraîchissez la page une fois corrigé.
+          </p>
+        </div>`;
+      return;
+    }
+    const params = new URLSearchParams(location.search);
+    state.eventId = params.get('event');
+    if(!state.eventId){
+      await loadEventsIndex();
+      state.mode = 'home';
+      render();
+      return;
+    }
+    await loadConfig();
+    if(state.config){ enterGuestMode(); } else { state.mode = 'setup'; }
+    render();
+  })();
+})();
+</script>
